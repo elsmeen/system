@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tersa ERP — نظام إدارة الأعمال</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #16161f;
+  --card: #1a1a25;
+  --card2: #1f1f2e;
+  --border: #2a2a3d;
+  --border2: #333350;
+  --accent: #6c63ff;
+  --accent2: #8b7fff;
+  --accent3: #4ade80;
+  --accent4: #f59e0b;
+  --accent5: #ef4444;
+  --text: #e8e8f0;
+  --text2: #9898b0;
+  --text3: #5c5c78;
+  --glow: rgba(108,99,255,0.15);
+  --glow2: rgba(74,222,128,0.1);
+}
+.light {
+  --bg: #f4f4f8;
+  --bg2: #ebebf2;
+  --bg3: #e2e2ec;
+  --card: #ffffff;
+  --card2: #f8f8fc;
+  --border: #d8d8e8;
+  --border2: #c5c5d8;
+  --text: #1a1a2e;
+  --text2: #5c5c78;
+  --text3: #9898b0;
+  --glow: rgba(108,99,255,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* LOGIN PAGE */
+.login-page {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+}
+.login-page.hidden { display: none; }
+.login-bg {
+  position: absolute; inset: 0; overflow: hidden;
+}
+.login-bg::before {
+  content: '';
+  position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 800px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.login-box {
+  position: relative; z-index: 1;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 22px; padding: 40px;
+  width: 420px; max-width: 95vw;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+  animation: loginIn 0.4s ease;
+}
+@keyframes loginIn {
+  from { opacity:0; transform: translateY(20px) scale(0.97); }
+  to { opacity:1; transform: translateY(0) scale(1); }
+}
+.login-logo {
+  display: flex; align-items: center; gap: 12px;
+  justify-content: center; margin-bottom: 32px;
+}
+.login-logo-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 0 30px var(--glow);
+}
+.login-logo-text { font-size: 24px; font-weight: 900; }
+.login-logo-sub { font-size: 12px; color: var(--text2); text-align: center; margin-bottom: 28px; }
+.login-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+.login-sub { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 28px; }
+.login-form { display: flex; flex-direction: column; gap: 16px; }
+.login-input-group { display: flex; flex-direction: column; gap: 6px; }
+.login-input-group label { font-size: 13px; font-weight: 600; color: var(--text2); }
+.login-input-wrapper {
+  position: relative; display: flex; align-items: center;
+}
+.login-input-wrapper .input-icon {
+  position: absolute; right: 12px; font-size: 16px; color: var(--text3);
+}
+.login-input-wrapper input {
+  padding-right: 40px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 40px 12px 12px;
+  color: var(--text); font-family: 'Cairo', sans-serif;
+  font-size: 14px; outline: none; width: 100%;
+  transition: border 0.2s;
+}
+.login-input-wrapper input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+.login-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; border: none; border-radius: 10px;
+  padding: 13px; font-size: 15px; font-weight: 700;
+  font-family: 'Cairo', sans-serif; cursor: pointer;
+  transition: all 0.2s; margin-top: 4px;
+  box-shadow: 0 4px 20px var(--glow);
+}
+.login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(108,99,255,0.4); }
+.login-btn:active { transform: translateY(0); }
+.login-error {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+  color: #ef4444; padding: 10px 14px; border-radius: 8px;
+  font-size: 13px; text-align: center; display: none;
+}
+.login-error.show { display: block; }
+.login-hint {
+  text-align: center; font-size: 12px; color: var(--text3);
+  margin-top: 20px;
+}
+.login-hint span { color: var(--accent2); font-weight: 600; }
+.login-users {
+  margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.login-users-title { font-size: 11px; color: var(--text3); text-align: center; margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase; }
+.login-user-chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.login-chip {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--bg3);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  color: var(--text2); transition: all 0.2s;
+}
+.login-chip:hover { border-color: var(--accent); color: var(--accent2); background: var(--glow); }
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: width 0.3s;
+}
+.sidebar-logo {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 0 20px var(--glow);
+}
+.logo-text { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; }
+.logo-sub { font-size: 11px; color: var(--text2); font-weight: 400; }
+.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.nav-section { margin-bottom: 24px; }
+.nav-label { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 1.5px; padding: 0 8px; margin-bottom: 6px; text-transform: uppercase; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px;
+  cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--text2); transition: all 0.2s;
+  margin-bottom: 2px; position: relative;
+}
+.nav-item:hover { background: var(--card); color: var(--text); }
+.nav-item.active {
+  background: var(--glow);
+  color: var(--accent2);
+  border: 1px solid rgba(108,99,255,0.2);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  right: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 60%;
+  background: var(--accent);
+  border-radius: 3px 0 0 3px;
+}
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-badge {
+  margin-right: auto; background: var(--accent5);
+  color: white; font-size: 10px; font-weight: 700;
+  padding: 2px 6px; border-radius: 20px;
+}
+.sidebar-bottom { padding: 16px 12px; border-top: 1px solid var(--border); }
+.user-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px;
+  background: var(--card); cursor: pointer;
+}
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: white;
+}
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text2); }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar {
+  height: 64px; background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 16px;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title { font-size: 20px; font-weight: 700; flex: 1; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border: none; font-family: 'Cairo', sans-serif;
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--card); color: var(--text); }
+.btn-icon { padding: 8px; }
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card);
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 16px;
+  color: var(--text2); transition: all 0.2s;
+}
+.theme-toggle:hover { color: var(--text); background: var(--card2); }
+.notif-btn {
+  position: relative; width: 36px; height: 36px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--text2);
+}
+.notif-dot {
+  position: absolute; top: 6px; left: 6px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent5); border: 2px solid var(--bg2);
+}
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* PAGES */
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* STATS GRID */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+.stat-card::before {
+  content: ''; position: absolute;
+  top: -20px; left: -20px;
+  width: 80px; height: 80px; border-radius: 50%;
+  opacity: 0.08;
+}
+.stat-card.green::before { background: var(--accent3); }
+.stat-card.blue::before { background: var(--accent); }
+.stat-card.yellow::before { background: var(--accent4); }
+.stat-card.red::before { background: var(--accent5); }
+.stat-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 8px; }
+.stat-value { font-size: 26px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.stat-value.green { color: var(--accent3); }
+.stat-value.blue { color: var(--accent2); }
+.stat-value.yellow { color: var(--accent4); }
+.stat-value.red { color: var(--accent5); }
+.stat-change { font-size: 12px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.stat-change.up { color: var(--accent3); }
+.stat-change.down { color: var(--accent5); }
+.stat-icon { position: absolute; top: 16px; left: 16px; font-size: 22px; opacity: 0.6; }
+
+/* CHARTS ROW */
+.charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+.chart-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px;
+}
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.chart-title { font-size: 15px; font-weight: 700; }
+.chart-tabs { display: flex; gap: 4px; }
+.chart-tab {
+  padding: 4px 10px; border-radius: 6px; font-size: 12px;
+  font-weight: 600; cursor: pointer; border: none;
+  font-family: 'Cairo', sans-serif;
+  background: transparent; color: var(--text2); transition: all 0.2s;
+}
+.chart-tab.active { background: var(--accent); color: white; }
+
+/* TABLE */
+.table-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden; margin-bottom: 24px;
+}
+.table-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.table-title { font-size: 15px; font-weight: 700; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  padding: 12px 20px; text-align: right;
+  font-size: 12px; font-weight: 600; color: var(--text2);
+  background: var(--bg3); border-bottom: 1px solid var(--border);
+  letter-spacing: 0.5px;
+}
+td {
+  padding: 14px 20px; font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg3); }
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+}
+.badge-green { background: rgba(74,222,128,0.12); color: var(--accent3); }
+.badge-yellow { background: rgba(245,158,11,0.12); color: var(--accent4); }
+.badge-red { background: rgba(239,68,68,0.12); color: var(--accent5); }
+.badge-blue { background: rgba(108,99,255,0.12); color: var(--accent2); }
+
+/* FORMS */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 13px; font-weight: 600; color: var(--text2); }
+input, select, textarea {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px;
+  color: var(--text); font-family: 'Cairo', sans-serif;
+  font-size: 14px; outline: none; transition: border 0.2s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+textarea { resize: vertical; min-height: 80px; }
+select option { background: var(--bg3); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  z-index: 1000; display: none;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 18px; padding: 28px; width: 520px;
+  max-width: 95vw; animation: modalIn 0.25s ease;
+}
+@keyframes modalIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.modal-title { font-size: 18px; font-weight: 700; }
+.modal-close { background: var(--bg3); border: none; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 16px; color: var(--text2); }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-start; margin-top: 24px; }
+
+/* AI CHAT */
+.ai-panel {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: 380px; background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; z-index: 200;
+  transform: translateX(-100%); transition: transform 0.3s;
+}
+.ai-panel.open { transform: translateX(0); }
+.ai-header {
+  padding: 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.ai-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; box-shadow: 0 0 20px var(--glow);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 20px var(--glow); }
+  50% { box-shadow: 0 0 40px rgba(108,99,255,0.4); }
+}
+.ai-title { font-size: 15px; font-weight: 700; }
+.ai-sub { font-size: 11px; color: var(--accent3); }
+.ai-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.ai-msg {
+  max-width: 85%; padding: 12px 14px; border-radius: 12px;
+  font-size: 13px; line-height: 1.6;
+}
+.ai-msg.bot {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px 12px 12px 4px; align-self: flex-start;
+}
+.ai-msg.user {
+  background: var(--accent); color: white;
+  border-radius: 12px 12px 4px 12px; align-self: flex-end;
+}
+.ai-input-row {
+  padding: 16px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+.ai-input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  color: var(--text); font-family: 'Cairo', sans-serif;
+  font-size: 13px; outline: none; resize: none; height: 40px;
+}
+.ai-send {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--accent); border: none; cursor: pointer;
+  color: white; font-size: 16px; display: flex;
+  align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.ai-send:hover { background: var(--accent2); transform: scale(1.05); }
+.typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+.typing-dots span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text2); animation: typing 1s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%,80%,100% { opacity:0.3; transform:scale(0.8); } 40% { opacity:1; transform:scale(1); } }
+
+/* ALERTS */
+.alerts-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px; }
+.alert-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.alert-icon { font-size: 20px; }
+.alert-text { font-size: 13px; font-weight: 600; }
+.alert-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.alert-card.warn { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+.alert-card.danger { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+.alert-card.info { border-color: rgba(108,99,255,0.3); background: rgba(108,99,255,0.05); }
+
+/* PROGRESS */
+.progress-bar { background: var(--bg3); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+/* EMPLOYEES */
+.employee-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.emp-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; text-align: center;
+  transition: transform 0.2s;
+}
+.emp-card:hover { transform: translateY(-3px); }
+.emp-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  margin: 0 auto 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: white;
+}
+.emp-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.emp-role { font-size: 12px; color: var(--text2); margin-bottom: 12px; }
+.emp-stats { display: flex; justify-content: center; gap: 16px; }
+.emp-stat { text-align: center; }
+.emp-stat-val { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.emp-stat-lbl { font-size: 10px; color: var(--text2); }
+
+/* INVENTORY */
+.inv-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+.inv-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px;
+}
+.inv-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.inv-cat { font-size: 11px; color: var(--text2); margin-bottom: 12px; }
+.inv-stock { font-size: 22px; font-weight: 700; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+.inv-price { font-size: 12px; color: var(--text2); }
+
+/* SEARCH */
+.search-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 14px;
+  margin-bottom: 20px;
+}
+.search-bar input {
+  border: none; background: transparent; flex: 1;
+  font-size: 14px; padding: 0;
+}
+.search-bar input:focus { box-shadow: none; }
+
+/* SECTION HEADER */
+.section-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 20px;
+}
+.section-title { font-size: 18px; font-weight: 700; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* AI FAB */
+.ai-fab {
+  position: fixed; bottom: 24px; left: 24px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  border: none; cursor: pointer; font-size: 22px;
+  box-shadow: 0 4px 24px var(--glow); z-index: 150;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.ai-fab:hover { transform: scale(1.1) !important; box-shadow: 0 8px 40px rgba(108,99,255,0.5); }
+
+/* DONUT CENTER */
+.donut-wrapper { position: relative; }
+.donut-center {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center; pointer-events: none;
+}
+.donut-center .val { font-size: 22px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.donut-center .lbl { font-size: 11px; color: var(--text2); }
+
+/* QUICK ACTIONS */
+.quick-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+.quick-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--text); font-family: 'Cairo', sans-serif;
+  transition: all 0.2s;
+}
+.quick-btn:hover { background: var(--card2); border-color: var(--accent); color: var(--accent2); }
+
+/* COMPANY SWITCHER */
+.company-switcher {
+  margin: 0 12px 16px; padding: 10px 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+}
+.company-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent3); }
+
+/* REPORTS */
+.report-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; }
+.report-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; cursor: pointer;
+  transition: all 0.2s; text-align: center;
+}
+.report-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.report-card-icon { font-size: 28px; margin-bottom: 10px; }
+.report-card-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.report-card-sub { font-size: 12px; color: var(--text2); }
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .inv-grid { grid-template-columns: repeat(2,1fr); }
+  .employee-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .charts-row { grid-template-columns: 1fr; }
+  .alerts-row { grid-template-columns: 1fr; }
+  .report-options { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="login-page" id="login-page">
+  <div class="login-bg"></div>
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">🏢</div>
+      <div class="login-logo-text">Tersa ERP</div>
+    </div>
+    <div class="login-sub">نظام إدارة الأعمال الذكي</div>
+    <div class="login-title">تسجيل الدخول</div>
+    <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:24px">أدخل بياناتك للوصول للنظام</div>
+    <div class="login-form">
+      <div class="login-input-group">
+        <label>البريد الإلكتروني</label>
+        <div class="login-input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="login-email" placeholder="admin@tersa.eg" autocomplete="email">
+        </div>
+      </div>
+      <div class="login-input-group">
+        <label>كلمة المرور</label>
+        <div class="login-input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+      </div>
+      <div class="login-error" id="login-error">بيانات غلط — جرب مرة تانية</div>
+      <button class="login-btn" onclick="doLogin()">دخول ←</button>
+    </div>
+    <div class="login-users">
+      <div class="login-users-title">تسجيل سريع</div>
+      <div class="login-user-chips">
+        <div class="login-chip" onclick="quickLogin('admin@tersa.eg','admin123','يوسف','مدير عام')">👑 أدمن</div>
+        <div class="login-chip" onclick="quickLogin('manager@tersa.eg','manager123','أحمد','مدير')">👔 مدير</div>
+        <div class="login-chip" onclick="quickLogin('acc@tersa.eg','acc123','سارة','محاسب')">📊 محاسب</div>
+        <div class="login-chip" onclick="quickLogin('emp@tersa.eg','emp123','محمود','موظف')">👤 موظف</div>
+      </div>
+    </div>
+    <div class="login-hint">الأدمن: <span>admin@tersa.eg</span> / <span>admin123</span></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏢</div>
+    <div>
+      <div class="logo-text">Tersa ERP</div>
+      <div class="logo-sub">نظام إدارة الأعمال</div>
+    </div>
+  </div>
+
+  <div class="company-switcher" onclick="alert('تبديل الشركة')">
+    <div class="company-dot"></div>
+    <span>Tersa Clothing</span>
+    <span style="margin-right:auto;color:var(--text3);font-size:16px">⌄</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">الرئيسية</div>
+      <div class="nav-item active" onclick="navigate('dashboard',this)">
+        <span class="nav-icon">📊</span> لوحة التحكم
+      </div>
+      <div class="nav-item" onclick="navigate('analytics',this)">
+        <span class="nav-icon">📈</span> التحليلات
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">المالية</div>
+      <div class="nav-item" onclick="navigate('finance',this)">
+        <span class="nav-icon">💰</span> الإيرادات والمصروفات
+      </div>
+      <div class="nav-item" onclick="navigate('reports',this)">
+        <span class="nav-icon">📄</span> التقارير
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">العمليات</div>
+      <div class="nav-item" onclick="navigate('employees',this)">
+        <span class="nav-icon">👥</span> الموظفون
+      </div>
+      <div class="nav-item" onclick="navigate('inventory',this)">
+        <span class="nav-icon">📦</span> المخزون
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" onclick="navigate('shopify',this)">
+        <span class="nav-icon">🛍️</span> Shopify
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">النظام</div>
+      <div class="nav-item" onclick="navigate('settings',this)">
+        <span class="nav-icon">⚙️</span> الإعدادات
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-card" style="justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="user-avatar">ي</div>
+        <div>
+          <div class="user-name">يوسف</div>
+          <div class="user-role">مدير عام</div>
+        </div>
+      </div>
+      <button onclick="logout()" title="تسجيل الخروج" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px">↩</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">لوحة التحكم</div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary" onclick="openModal('add-transaction')">+ إضافة معاملة</button>
+      <div class="notif-btn" onclick="showNotif()">🔔<div class="notif-dot"></div></div>
+      <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="alerts-row">
+        <div class="alert-card warn">
+          <div class="alert-icon">⚠️</div>
+          <div>
+            <div class="alert-text">مخزون منخفض</div>
+            <div class="alert-sub">3 منتجات تحت الحد الأدنى</div>
+          </div>
+        </div>
+        <div class="alert-card info">
+          <div class="alert-icon">📦</div>
+          <div>
+            <div class="alert-text">12 أوردر جديد</div>
+            <div class="alert-sub">من Shopify — اليوم</div>
+          </div>
+        </div>
+        <div class="alert-card danger">
+          <div class="alert-icon">💸</div>
+          <div>
+            <div class="alert-text">رواتب الشهر</div>
+            <div class="alert-sub">استحقاق: 5 يناير</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">إجمالي الإيرادات</div>
+          <div class="stat-value green">285,400 ج</div>
+          <div class="stat-change up">↑ 18.3% من الشهر الماضي</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">💸</div>
+          <div class="stat-label">إجمالي المصروفات</div>
+          <div class="stat-value red">142,200 ج</div>
+          <div class="stat-change down">↑ 7.1% من الشهر الماضي</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">📊</div>
+          <div class="stat-label">صافي الربح</div>
+          <div class="stat-value blue">143,200 ج</div>
+          <div class="stat-change up">↑ 29.5% هامش الربح</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon">🛍️</div>
+          <div class="stat-label">أوردرات Shopify</div>
+          <div class="stat-value yellow">347</div>
+          <div class="stat-change up">↑ 24 أوردر اليوم</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">الإيرادات والمصروفات</div>
+            <div class="chart-tabs">
+              <button class="chart-tab active" onclick="switchChart('weekly',this)">أسبوعي</button>
+              <button class="chart-tab" onclick="switchChart('monthly',this)">شهري</button>
+              <button class="chart-tab" onclick="switchChart('yearly',this)">سنوي</button>
+            </div>
+          </div>
+          <canvas id="mainChart" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">توزيع المصروفات</div>
+          </div>
+          <div class="donut-wrapper" style="position:relative">
+            <canvas id="donutChart" height="200"></canvas>
+            <div class="donut-center">
+              <div class="val">142k</div>
+              <div class="lbl">إجمالي</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">آخر المعاملات</div>
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px">عرض الكل</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الوصف</th>
+              <th>الفئة</th>
+              <th>التاريخ</th>
+              <th>النوع</th>
+              <th>المبلغ</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-table">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FINANCE PAGE -->
+    <div class="page" id="page-finance">
+      <div class="section-header">
+        <div class="section-title">الإيرادات والمصروفات</div>
+        <button class="btn btn-primary" onclick="openModal('add-transaction')">+ معاملة جديدة</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">إيرادات الشهر</div>
+          <div class="stat-value green">285,400 ج</div>
+          <div class="stat-change up">↑ 18.3%</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">مصروفات الشهر</div>
+          <div class="stat-value red">142,200 ج</div>
+          <div class="stat-change down">↑ 7.1%</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">صافي الربح</div>
+          <div class="stat-value blue">143,200 ج</div>
+          <div class="stat-change up">↑ 50.2%</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">المعاملات المعلقة</div>
+          <div class="stat-value yellow">7</div>
+          <div class="stat-change">بحاجة مراجعة</div>
+        </div>
+      </div>
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" placeholder="بحث في المعاملات..." oninput="filterTransactions(this.value)">
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">كل المعاملات</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="exportCSV()">📥 تصدير CSV</button>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px">📄 تصدير PDF</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الوصف</th>
+              <th>الفئة</th>
+              <th>التاريخ</th>
+              <th>النوع</th>
+              <th>المبلغ</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="finance-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EMPLOYEES PAGE -->
+    <div class="page" id="page-employees">
+      <div class="section-header">
+        <div class="section-title">إدارة الموظفين</div>
+        <button class="btn btn-primary" onclick="openModal('add-employee')">+ موظف جديد</button>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card blue"><div class="stat-label">إجمالي الموظفين</div><div class="stat-value blue">8</div></div>
+        <div class="stat-card green"><div class="stat-label">إجمالي الرواتب</div><div class="stat-value green">42,000 ج</div></div>
+        <div class="stat-card yellow"><div class="stat-label">حاضرون اليوم</div><div class="stat-value yellow">7</div></div>
+        <div class="stat-card red"><div class="stat-label">طلبات إجازة</div><div class="stat-value red">2</div></div>
+      </div>
+      <div class="employee-grid" id="employees-grid"></div>
+    </div>
+
+    <!-- INVENTORY PAGE -->
+    <div class="page" id="page-inventory">
+      <div class="section-header">
+        <div class="section-title">إدارة المخزون</div>
+        <button class="btn btn-primary" onclick="openModal('add-product')">+ منتج جديد</button>
+      </div>
+      <div class="inv-grid" id="inventory-grid"></div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">تفاصيل المخزون</div></div>
+        <table>
+          <thead><tr><th>المنتج</th><th>الفئة</th><th>المخزون</th><th>سعر التكلفة</th><th>سعر البيع</th><th>الموردين</th><th>الحالة</th></tr></thead>
+          <tbody id="inventory-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ANALYTICS PAGE -->
+    <div class="page" id="page-analytics">
+      <div class="section-header">
+        <div class="section-title">التحليلات المتقدمة</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">هامش الربح</div><div class="stat-value green">50.2%</div><div class="stat-change up">↑ 3.1% عن الشهر</div></div>
+        <div class="stat-card blue"><div class="stat-label">معدل النمو</div><div class="stat-value blue">18.3%</div><div class="stat-change up">مقارنة بالعام الماضي</div></div>
+        <div class="stat-card yellow"><div class="stat-label">متوسط قيمة الأوردر</div><div class="stat-value yellow">823 ج</div><div class="stat-change up">↑ 12.5%</div></div>
+        <div class="stat-card red"><div class="stat-label">معدل الإرجاع</div><div class="stat-value red">2.3%</div><div class="stat-change up">↓ 0.5% تحسن</div></div>
+      </div>
+      <div class="charts-row" style="grid-template-columns:1fr 1fr">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">ربح كل منتج</div></div>
+          <canvas id="productChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">توقع الإيرادات (AI)</div></div>
+          <canvas id="forecastChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS PAGE -->
+    <div class="page" id="page-reports">
+      <div class="section-header"><div class="section-title">التقارير المالية</div></div>
+      <div class="report-options">
+        <div class="report-card" onclick="generateReport('monthly')">
+          <div class="report-card-icon">📅</div>
+          <div class="report-card-title">التقرير الشهري</div>
+          <div class="report-card-sub">ملخص كامل للشهر الحالي</div>
+        </div>
+        <div class="report-card" onclick="generateReport('profit')">
+          <div class="report-card-icon">📊</div>
+          <div class="report-card-title">قائمة الأرباح والخسائر</div>
+          <div class="report-card-sub">P&L Statement</div>
+        </div>
+        <div class="report-card" onclick="generateReport('cashflow')">
+          <div class="report-card-icon">💵</div>
+          <div class="report-card-title">التدفق النقدي</div>
+          <div class="report-card-sub">Cash Flow Statement</div>
+        </div>
+        <div class="report-card" onclick="generateReport('expense')">
+          <div class="report-card-icon">💸</div>
+          <div class="report-card-title">تقرير المصروفات</div>
+          <div class="report-card-sub">تفصيلي حسب الفئة</div>
+        </div>
+        <div class="report-card" onclick="generateReport('employee')">
+          <div class="report-card-icon">👥</div>
+          <div class="report-card-title">تقرير الرواتب</div>
+          <div class="report-card-sub">كشف رواتب الموظفين</div>
+        </div>
+        <div class="report-card" onclick="generateReport('inventory')">
+          <div class="report-card-icon">📦</div>
+          <div class="report-card-title">تقرير المخزون</div>
+          <div class="report-card-sub">حركة المخزون والمبيعات</div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><div class="chart-title">ملخص سنوي</div></div>
+        <canvas id="annualChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- SHOPIFY PAGE -->
+    <div class="page" id="page-shopify">
+      <div class="section-header">
+        <div class="section-title">تكامل Shopify</div>
+        <div style="display:flex;gap:8px">
+          <span class="badge badge-green">● متصل</span>
+          <button class="btn btn-primary" onclick="syncShopify()">🔄 مزامنة الآن</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-label">أوردرات اليوم</div><div class="stat-value green">24</div></div>
+        <div class="stat-card blue"><div class="stat-label">إيرادات Shopify</div><div class="stat-value blue">19,800 ج</div></div>
+        <div class="stat-card yellow"><div class="stat-label">أوردرات معلقة</div><div class="stat-value yellow">8</div></div>
+        <div class="stat-card red"><div class="stat-label">مرتجعات</div><div class="stat-value red">3</div></div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">آخر أوردرات Shopify</div></div>
+        <table>
+          <thead><tr><th>#أوردر</th><th>العميل</th><th>المنتجات</th><th>التاريخ</th><th>الحالة</th><th>المبلغ</th></tr></thead>
+          <tbody id="shopify-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="section-header"><div class="section-title">الإعدادات</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:16px">معلومات الشركة</div>
+          <div class="form-grid">
+            <div class="form-group full"><label>اسم الشركة</label><input value="Tersa Clothing"></div>
+            <div class="form-group"><label>البريد الإلكتروني</label><input value="info@tersa.eg"></div>
+            <div class="form-group"><label>العملة</label><select><option>جنيه مصري (ج)</option><option>دولار أمريكي ($)</option></select></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:16px">تكامل Shopify</div>
+          <div class="form-group" style="margin-bottom:12px"><label>Shopify Store URL</label><input placeholder="your-store.myshopify.com"></div>
+          <div class="form-group" style="margin-bottom:12px"><label>API Key</label><input type="password" placeholder="شك api key هنا"></div>
+          <div class="form-group" style="margin-bottom:16px"><label>Bosta API Key</label><input type="password" placeholder="bosta api key هنا"></div>
+          <button class="btn btn-primary">حفظ الإعدادات</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- AI PANEL -->
+<div class="ai-panel" id="ai-panel">
+  <div class="ai-header">
+    <div class="ai-avatar">🤖</div>
+    <div>
+      <div class="ai-title">المساعد الذكي</div>
+      <div class="ai-sub">● متصل بـ Claude AI</div>
+    </div>
+    <button onclick="toggleAI()" style="margin-right:auto;background:var(--bg3);border:none;border-radius:8px;width:28px;height:28px;cursor:pointer;color:var(--text2)">✕</button>
+  </div>
+  <div class="ai-messages" id="ai-messages">
+    <div class="ai-msg bot">مرحباً يوسف! 👋 أنا مساعدك الذكي لـ Tersa ERP. اسألني أي سؤال عن أعمالك.</div>
+    <div class="ai-msg bot">
+      جرب مثلاً:
+      <br>• "كام صرفنا على الإعلانات؟"
+      <br>• "إيه أكتر منتج بيكسب؟"
+      <br>• "حلل أداء الشهر ده"
+      <br>• "توقع إيرادات الشهر الجاي"
+    </div>
+  </div>
+  <div class="ai-input-row">
+    <textarea class="ai-input" id="ai-input" placeholder="اسأل عن أعمالك..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI()}"></textarea>
+    <button class="ai-send" onclick="sendAI()">↑</button>
+  </div>
+</div>
+
+<!-- AI FAB -->
+<button class="ai-fab" onclick="toggleAI()" title="المساعد الذكي">🤖</button>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-add-transaction">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">إضافة معاملة جديدة</div>
+      <button class="modal-close" onclick="closeModal('add-transaction')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>النوع</label>
+        <select id="tx-type">
+          <option value="revenue">إيراد</option>
+          <option value="expense">مصروف</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>الفئة</label>
+        <select id="tx-cat">
+          <option>مبيعات</option>
+          <option>إعلانات</option>
+          <option>رواتب</option>
+          <option>شحن ولوجستيات</option>
+          <option>إيجار</option>
+          <option>مشتريات</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>الوصف</label>
+        <input type="text" id="tx-desc" placeholder="وصف المعاملة...">
+      </div>
+      <div class="form-group">
+        <label>المبلغ (ج)</label>
+        <input type="number" id="tx-amount" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>التاريخ</label>
+        <input type="date" id="tx-date">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="addTransaction()">إضافة</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-transaction')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-employee">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">إضافة موظف جديد</div>
+      <button class="modal-close" onclick="closeModal('add-employee')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>الاسم</label><input id="emp-name" placeholder="اسم الموظف"></div>
+      <div class="form-group"><label>الدور</label><select id="emp-role"><option>محاسب</option><option>مدير مبيعات</option><option>موظف مخزن</option><option>مدير تسويق</option><option>موظف خدمة عملاء</option></select></div>
+      <div class="form-group"><label>الراتب (ج)</label><input id="emp-salary" type="number" placeholder="0"></div>
+      <div class="form-group"><label>تاريخ الانضمام</label><input id="emp-date" type="date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="addEmployee()">إضافة</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-employee')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-product">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">إضافة منتج للمخزون</div>
+      <button class="modal-close" onclick="closeModal('add-product')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label>اسم المنتج</label><input id="prod-name" placeholder="اسم المنتج"></div>
+      <div class="form-group"><label>الفئة</label><input id="prod-cat" placeholder="مثال: تيشيرتات"></div>
+      <div class="form-group"><label>الكمية</label><input id="prod-stock" type="number" placeholder="0"></div>
+      <div class="form-group"><label>سعر التكلفة (ج)</label><input id="prod-cost" type="number" placeholder="0"></div>
+      <div class="form-group"><label>سعر البيع (ج)</label><input id="prod-price" type="number" placeholder="0"></div>
+      <div class="form-group"><label>المورد</label><input id="prod-supplier" placeholder="اسم المورد"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="addProduct()">إضافة</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-product')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+let transactions = [
+  {id:1, desc:'مبيعات Shopify - يناير', cat:'مبيعات', date:'2025-01-15', type:'revenue', amount:48200},
+  {id:2, desc:'إعلانات فيسبوك وإنستجرام', cat:'إعلانات', date:'2025-01-14', type:'expense', amount:8500},
+  {id:3, desc:'رواتب الموظفين', cat:'رواتب', date:'2025-01-10', type:'expense', amount:42000},
+  {id:4, desc:'مبيعات مباشرة', cat:'مبيعات', date:'2025-01-12', type:'revenue', amount:22800},
+  {id:5, desc:'شحن ولوجستيات', cat:'شحن', date:'2025-01-13', type:'expense', amount:12400},
+  {id:6, desc:'مشتريات خامات', cat:'مشتريات', date:'2025-01-08', type:'expense', amount:31000},
+  {id:7, desc:'عمولة Shopify', cat:'أخرى', date:'2025-01-16', type:'expense', amount:2800},
+  {id:8, desc:'مبيعات جملة', cat:'مبيعات', date:'2025-01-17', type:'revenue', amount:35600},
+];
+
+let employees = [
+  {name:'أحمد محمد', role:'محاسب', salary:7000, color:'#6c63ff', attendance:95},
+  {name:'سارة علي', role:'مدير مبيعات', salary:9000, color:'#4ade80', attendance:98},
+  {name:'محمود حسن', role:'موظف مخزن', salary:4500, color:'#f59e0b', attendance:88},
+  {name:'نور إبراهيم', role:'مدير تسويق', salary:8500, color:'#ef4444', attendance:92},
+  {name:'خالد عمر', role:'خدمة عملاء', salary:5000, color:'#a78bfa', attendance:90},
+  {name:'ريم أحمد', role:'مصممة', salary:7500, color:'#38bdf8', attendance:97},
+];
+
+let inventory = [
+  {name:'تيشيرت أوفر سايز', cat:'تيشيرتات', stock:145, cost:85, price:195, supplier:'مصنع الأمل', low:50},
+  {name:'هودي بريميوم', cat:'هوديز', stock:28, cost:155, price:380, supplier:'المورد الأول', low:30},
+  {name:'كاب Tersa', cat:'إكسسوارات', stock:212, cost:35, price:120, supplier:'مصنع الكابات', low:50},
+  {name:'شورت سبورت', cat:'بناطيل', stock:18, cost:95, price:220, supplier:'المورد الثاني', low:25},
+  {name:'تيشيرت بولو', cat:'تيشيرتات', stock:89, cost:110, price:250, supplier:'مصنع الأمل', low:40},
+  {name:'حقيبة Tersa', cat:'إكسسوارات', stock:54, cost:180, price:450, supplier:'مصنع الجلود', low:20},
+  {name:'سويت شيرت', cat:'هوديز', stock:12, cost:130, price:320, supplier:'المورد الأول', low:20},
+  {name:'ليجنز بنات', cat:'بناطيل', stock:77, cost:75, price:175, supplier:'مصنع السيدات', low:30},
+];
+
+let shopifyOrders = [
+  {id:'#1247', customer:'أميرة صالح', products:'هودي + كاب', date:'2025-01-17', status:'مكتمل', amount:500},
+  {id:'#1246', customer:'كريم طارق', products:'تيشيرت × 2', date:'2025-01-17', status:'قيد الشحن', amount:390},
+  {id:'#1245', customer:'لمى نور', products:'هودي', date:'2025-01-16', status:'مكتمل', amount:380},
+  {id:'#1244', customer:'باسم علي', products:'شورت + تيشيرت', date:'2025-01-16', status:'معلق', amount:415},
+  {id:'#1243', customer:'دينا محمد', products:'حقيبة Tersa', date:'2025-01-15', status:'مكتمل', amount:450},
+  {id:'#1242', customer:'عمر خالد', products:'تيشيرت بولو × 3', date:'2025-01-15', status:'قيد الشحن', amount:750},
+];
+
+// ===== NAVIGATION =====
+function navigate(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  el.classList.add('active');
+  const titles = {
+    dashboard:'لوحة التحكم', finance:'الإيرادات والمصروفات',
+    employees:'إدارة الموظفين', inventory:'إدارة المخزون',
+    analytics:'التحليلات', reports:'التقارير', shopify:'تكامل Shopify',
+    settings:'الإعدادات'
+  };
+  document.getElementById('page-title').textContent = titles[page] || page;
+  if (page === 'analytics') initAnalyticsCharts();
+  if (page === 'reports') initReportsChart();
+  if (page === 'shopify') renderShopify();
+}
+
+// ===== THEME =====
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const btn = document.querySelector('.theme-toggle');
+  btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+}
+
+// ===== CHARTS =====
+let mainChart, donutChart;
+function initCharts() {
+  const weeklyData = {
+    labels:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],
+    revenue:[8200,12400,9800,15600,11200,18400,14300],
+    expense:[4100,5200,3900,6800,4600,7200,5900]
+  };
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  mainChart = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:weeklyData.labels,
+      datasets:[
+        {label:'إيرادات',data:weeklyData.revenue,backgroundColor:'rgba(74,222,128,0.6)',borderColor:'#4ade80',borderWidth:1,borderRadius:6},
+        {label:'مصروفات',data:weeklyData.expense,backgroundColor:'rgba(239,68,68,0.6)',borderColor:'#ef4444',borderWidth:1,borderRadius:6}
+      ]
+    },
+    options:{responsive:true,plugins:{legend:{labels:{color:'#9898b0',font:{family:'Cairo'}}}},scales:{x:{ticks:{color:'#9898b0',font:{family:'Cairo'}},grid:{color:'#2a2a3d'}},y:{ticks:{color:'#9898b0',font:{family:'Cairo'}},grid:{color:'#2a2a3d'}}}}
+  });
+
+  const dCtx = document.getElementById('donutChart').getContext('2d');
+  donutChart = new Chart(dCtx, {
+    type:'doughnut',
+    data:{
+      labels:['إعلانات','رواتب','شحن','مشتريات','أخرى'],
+      datasets:[{data:[8500,42000,12400,31000,2800],backgroundColor:['#6c63ff','#4ade80','#f59e0b','#ef4444','#a78bfa'],borderWidth:0,hoverOffset:8}]
+    },
+    options:{responsive:true,cutout:'70%',plugins:{legend:{position:'bottom',labels:{color:'#9898b0',font:{family:'Cairo'},padding:12}}}}
+  });
+}
+
+const chartDataSets = {
+  weekly:{labels:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],revenue:[8200,12400,9800,15600,11200,18400,14300],expense:[4100,5200,3900,6800,4600,7200,5900]},
+  monthly:{labels:['أكتوبر','نوفمبر','ديسمبر','يناير'],revenue:[68000,82000,95000,285400],expense:[34000,41000,47000,142200]},
+  yearly:{labels:['2022','2023','2024','2025'],revenue:[320000,480000,720000,1140000],expense:[180000,260000,390000,570000]}
+};
+
+function switchChart(period, el) {
+  document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const d = chartDataSets[period];
+  mainChart.data.labels = d.labels;
+  mainChart.data.datasets[0].data = d.revenue;
+  mainChart.data.datasets[1].data = d.expense;
+  mainChart.update();
+}
+
+function initAnalyticsCharts() {
+  setTimeout(() => {
+    const p = document.getElementById('productChart');
+    if (!p || p._chart) return;
+    const ctx = p.getContext('2d');
+    p._chart = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels:['هودي','تيشيرت','حقيبة','كاب','شورت','بولو'],
+        datasets:[{label:'الربح (ج)',data:[14500,28400,15600,9800,7200,11400],backgroundColor:'rgba(108,99,255,0.7)',borderRadius:6}]
+      },
+      options:{responsive:true,plugins:{legend:{labels:{color:'#9898b0',font:{family:'Cairo'}}}},scales:{x:{ticks:{color:'#9898b0'},grid:{color:'#2a2a3d'}},y:{ticks:{color:'#9898b0'},grid:{color:'#2a2a3d'}}}}
+    });
+
+    const f = document.getElementById('forecastChart');
+    const fctx = f.getContext('2d');
+    f._chart = new Chart(fctx, {
+      type:'line',
+      data:{
+        labels:['أكتوبر','نوفمبر','ديسمبر','يناير','فبراير*','مارس*'],
+        datasets:[
+          {label:'فعلي',data:[68000,82000,95000,110000,null,null],borderColor:'#4ade80',tension:0.4,fill:false,pointRadius:5},
+          {label:'توقع AI',data:[null,null,null,110000,128000,149000],borderColor:'#6c63ff',borderDash:[5,5],tension:0.4,fill:false,pointRadius:5}
+        ]
+      },
+      options:{responsive:true,plugins:{legend:{labels:{color:'#9898b0',font:{family:'Cairo'}}}},scales:{x:{ticks:{color:'#9898b0'},grid:{color:'#2a2a3d'}},y:{ticks:{color:'#9898b0'},grid:{color:'#2a2a3d'}}}}
+    });
+  }, 100);
+}
+
+function initReportsChart() {
+  setTimeout(() => {
+    const el = document.getElementById('annualChart');
+    if (!el || el._chart) return;
+    const ctx = el.getContext('2d');
+    el._chart = new Chart(ctx, {
+      type:'line',
+      data:{
+        labels:['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],
+        datasets:[
+          {label:'إيرادات',data:[68000,72000,85000,91000,105000,118000,125000,132000,145000,158000,172000,190000],borderColor:'#4ade80',fill:true,backgroundColor:'rgba(74,222,128,0.05)',tension:0.4},
+          {label:'مصروفات',data:[34000,36000,42000,45000,52000,59000,62000,66000,72000,79000,86000,95000],borderColor:'#ef4444',fill:true,backgroundColor:'rgba(239,68,68,0.05)',tension:0.4}
+        ]
+      },
+      options:{responsive:true,plugins:{legend:{labels:{color:'#9898b0',font:{family:'Cairo'}}}},scales:{x:{ticks:{color:'#9898b0'},grid:{color:'#2a2a3d'}},y:{ticks:{color:'#9898b0'},grid:{color:'#2a2a3d'}}}}
+    });
+  }, 100);
+}
+
+// ===== RENDER =====
+function renderTransactions() {
+  const tbody = document.getElementById('transactions-table');
+  if (!tbody) return;
+  const recent = transactions.slice(-6).reverse();
+  tbody.innerHTML = recent.map(t => `
+    <tr>
+      <td style="color:var(--text3);font-family:'JetBrains Mono'">#${t.id}</td>
+      <td>${t.desc}</td>
+      <td><span class="badge badge-blue">${t.cat}</span></td>
+      <td style="color:var(--text2)">${t.date}</td>
+      <td><span class="badge ${t.type==='revenue'?'badge-green':'badge-red'}">${t.type==='revenue'?'إيراد':'مصروف'}</span></td>
+      <td style="font-family:'JetBrains Mono';color:${t.type==='revenue'?'var(--accent3)':'var(--accent5)'}">${t.type==='revenue'?'+':'-'}${t.amount.toLocaleString()} ج</td>
+    </tr>`).join('');
+
+  const ft = document.getElementById('finance-table');
+  if (!ft) return;
+  ft.innerHTML = transactions.map(t => `
+    <tr>
+      <td style="color:var(--text3);font-family:'JetBrains Mono'">#${t.id}</td>
+      <td>${t.desc}</td>
+      <td><span class="badge badge-blue">${t.cat}</span></td>
+      <td>${t.date}</td>
+      <td><span class="badge ${t.type==='revenue'?'badge-green':'badge-red'}">${t.type==='revenue'?'إيراد':'مصروف'}</span></td>
+      <td style="font-family:'JetBrains Mono';color:${t.type==='revenue'?'var(--accent3)':'var(--accent5)'}">${t.type==='revenue'?'+':'-'}${t.amount.toLocaleString()} ج</td>
+      <td><button onclick="deleteTransaction(${t.id})" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:12px">حذف</button></td>
+    </tr>`).join('');
+}
+
+function renderEmployees() {
+  const grid = document.getElementById('employees-grid');
+  if (!grid) return;
+  grid.innerHTML = employees.map(e => `
+    <div class="emp-card">
+      <div class="emp-avatar" style="background:${e.color}">${e.name[0]}</div>
+      <div class="emp-name">${e.name}</div>
+      <div class="emp-role">${e.role}</div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px">
+          <span>الحضور</span><span>${e.attendance}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${e.attendance}%;background:${e.color}"></div></div>
+      </div>
+      <div class="emp-stats">
+        <div class="emp-stat">
+          <div class="emp-stat-val" style="color:var(--accent3)">${e.salary.toLocaleString()}</div>
+          <div class="emp-stat-lbl">الراتب (ج)</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderInventory() {
+  const grid = document.getElementById('inventory-grid');
+  if (grid) {
+    const lowItems = inventory.filter(p => p.stock < p.low);
+    grid.innerHTML = `
+      <div class="stat-card blue"><div class="stat-label">إجمالي المنتجات</div><div class="stat-value blue">${inventory.length}</div></div>
+      <div class="stat-card green"><div class="stat-label">قيمة المخزون</div><div class="stat-value green">${inventory.reduce((s,p)=>s+p.stock*p.cost,0).toLocaleString()} ج</div></div>
+      <div class="stat-card red"><div class="stat-label">مخزون منخفض</div><div class="stat-value red">${lowItems.length}</div></div>
+      <div class="stat-card yellow"><div class="stat-label">هامش الربح الإجمالي</div><div class="stat-value yellow">56%</div></div>
+    `;
+  }
+  const tbody = document.getElementById('inventory-table');
+  if (!tbody) return;
+  tbody.innerHTML = inventory.map(p => `
+    <tr>
+      <td><b>${p.name}</b></td>
+      <td><span class="badge badge-blue">${p.cat}</span></td>
+      <td style="font-family:'JetBrains Mono'">${p.stock}</td>
+      <td>${p.cost} ج</td>
+      <td>${p.price} ج</td>
+      <td>${p.supplier}</td>
+      <td><span class="badge ${p.stock < p.low ? 'badge-red' : p.stock < p.low*1.5 ? 'badge-yellow' : 'badge-green'}">${p.stock < p.low ? 'منخفض' : p.stock < p.low*1.5 ? 'تحذير' : 'جيد'}</span></td>
+    </tr>`).join('');
+}
+
+function renderShopify() {
+  const tbody = document.getElementById('shopify-table');
+  if (!tbody) return;
+  tbody.innerHTML = shopifyOrders.map(o => `
+    <tr>
+      <td style="font-family:'JetBrains Mono'">${o.id}</td>
+      <td>${o.customer}</td>
+      <td>${o.products}</td>
+      <td>${o.date}</td>
+      <td><span class="badge ${o.status==='مكتمل'?'badge-green':o.status==='معلق'?'badge-yellow':'badge-blue'}">${o.status}</span></td>
+      <td style="font-family:'JetBrains Mono'">${o.amount} ج</td>
+    </tr>`).join('');
+}
+
+// ===== ACTIONS =====
+function addTransaction() {
+  const type = document.getElementById('tx-type').value;
+  const cat = document.getElementById('tx-cat').value;
+  const desc = document.getElementById('tx-desc').value;
+  const amount = parseFloat(document.getElementById('tx-amount').value);
+  const date = document.getElementById('tx-date').value;
+  if (!desc || !amount || !date) return alert('يرجى ملء جميع الحقول');
+  transactions.push({id: transactions.length+1, desc, cat, date, type, amount});
+  closeModal('add-transaction');
+  renderTransactions();
+}
+
+function deleteTransaction(id) {
+  if (confirm('هل أنت متأكد من الحذف؟')) {
+    transactions = transactions.filter(t => t.id !== id);
+    renderTransactions();
+  }
+}
+
+function addEmployee() {
+  const name = document.getElementById('emp-name').value;
+  const role = document.getElementById('emp-role').value;
+  const salary = parseInt(document.getElementById('emp-salary').value);
+  if (!name || !salary) return alert('يرجى ملء جميع الحقول');
+  const colors = ['#6c63ff','#4ade80','#f59e0b','#ef4444','#a78bfa','#38bdf8'];
+  employees.push({name, role, salary, color: colors[employees.length % colors.length], attendance: 100});
+  closeModal('add-employee');
+  renderEmployees();
+}
+
+function addProduct() {
+  const name = document.getElementById('prod-name').value;
+  const cat = document.getElementById('prod-cat').value;
+  const stock = parseInt(document.getElementById('prod-stock').value);
+  const cost = parseInt(document.getElementById('prod-cost').value);
+  const price = parseInt(document.getElementById('prod-price').value);
+  const supplier = document.getElementById('prod-supplier').value;
+  if (!name || !stock || !cost || !price) return alert('يرجى ملء الحقول المطلوبة');
+  inventory.push({name, cat, stock, cost, price, supplier, low: 20});
+  closeModal('add-product');
+  renderInventory();
+}
+
+function filterTransactions(q) {
+  const rows = document.querySelectorAll('#finance-table tr');
+  rows.forEach(r => {
+    r.style.display = r.textContent.includes(q) ? '' : 'none';
+  });
+}
+
+function exportCSV() {
+  const csv = ['#,الوصف,الفئة,التاريخ,النوع,المبلغ',
+    ...transactions.map(t => `${t.id},${t.desc},${t.cat},${t.date},${t.type==='revenue'?'إيراد':'مصروف'},${t.amount}`)
+  ].join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tersa-transactions.csv';
+  a.click();
+}
+
+function syncShopify() {
+  const btn = event.target;
+  btn.textContent = '⏳ جاري المزامنة...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '✅ تمت المزامنة';
+    setTimeout(() => { btn.textContent = '🔄 مزامنة الآن'; btn.disabled = false; }, 2000);
+  }, 2000);
+}
+
+function generateReport(type) {
+  const names = {monthly:'التقرير الشهري',profit:'قائمة الأرباح',cashflow:'التدفق النقدي',expense:'تقرير المصروفات',employee:'تقرير الرواتب',inventory:'تقرير المخزون'};
+  alert(`✅ جاري إنشاء ${names[type]}...\n\nفي النسخة الكاملة، سيتم تحميل PDF تلقائياً.`);
+}
+
+function showNotif() {
+  alert('🔔 الإشعارات:\n\n• 3 منتجات مخزون منخفض\n• 12 أوردر جديد من Shopify\n• رواتب الشهر: استحقاق 5 يناير\n• تقرير أسبوعي جاهز');
+}
+
+// ===== MODAL =====
+function openModal(id) {
+  document.getElementById('modal-'+id).classList.add('open');
+  const dateInputs = document.querySelectorAll('#modal-'+id+' input[type="date"]');
+  dateInputs.forEach(i => { if (!i.value) i.value = new Date().toISOString().split('T')[0]; });
+}
+function closeModal(id) {
+  document.getElementById('modal-'+id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ===== AI ASSISTANT =====
+let aiOpen = false;
+function toggleAI() {
+  aiOpen = !aiOpen;
+  document.getElementById('ai-panel').classList.toggle('open', aiOpen);
+}
+
+const businessContext = `
+أنت مساعد ذكي لنظام إدارة أعمال اسمه Tersa ERP. الشركة اسمها Tersa Clothing.
+البيانات الحالية:
+- إجمالي الإيرادات هذا الشهر: 285,400 جنيه
+- إجمالي المصروفات: 142,200 جنيه
+- صافي الربح: 143,200 جنيه
+- عدد الموظفين: ${employees.length}
+- إجمالي الرواتب: ${employees.reduce((s,e)=>s+e.salary,0).toLocaleString()} جنيه
+- عدد المنتجات في المخزون: ${inventory.length}
+- المنتجات التي مخزونها منخفض: ${inventory.filter(p=>p.stock<p.low).map(p=>p.name).join(', ')}
+- إعلانات فيسبوك وإنستجرام: 8,500 جنيه
+- أوردرات Shopify اليوم: 24
+
+أجب بالعربية بشكل موجز ومفيد. قدم تحليلات وتوصيات عملية.
+`;
+
+async function sendAI() {
+  const input = document.getElementById('ai-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addMsg(msg, 'user');
+  const typing = addTyping();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: businessContext,
+        messages: [{role:'user',content:msg}]
+      })
+    });
+    const data = await res.json();
+    typing.remove();
+    const text = data.content?.[0]?.text || 'عذراً، حدث خطأ.';
+    addMsg(text, 'bot');
+  } catch(e) {
+    typing.remove();
+    addMsg('عذراً، تعذر الاتصال. تأكد من اتصال الإنترنت.', 'bot');
+  }
+}
+
+function addMsg(text, role) {
+  const msgs = document.getElementById('ai-messages');
+  const div = document.createElement('div');
+  div.className = `ai-msg ${role}`;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('ai-messages');
+  const div = document.createElement('div');
+  div.className = 'ai-msg bot';
+  div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+// ===== AUTH =====
+const USERS = [
+  {email:'admin@tersa.eg', password:'admin123', name:'يوسف', role:'مدير عام'},
+  {email:'manager@tersa.eg', password:'manager123', name:'أحمد', role:'مدير'},
+  {email:'acc@tersa.eg', password:'acc123', name:'سارة', role:'محاسب'},
+  {email:'emp@tersa.eg', password:'emp123', name:'محمود', role:'موظف'},
+];
+
+let currentUser = null;
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  const user = USERS.find(u => u.email === email && u.password === password);
+  if (!user) {
+    err.classList.add('show');
+    document.getElementById('login-password').value = '';
+    setTimeout(() => err.classList.remove('show'), 3000);
+    return;
+  }
+  loginSuccess(user);
+}
+
+function quickLogin(email, password, name, role) {
+  document.getElementById('login-email').value = email;
+  document.getElementById('login-password').value = password;
+  setTimeout(doLogin, 200);
+}
+
+function loginSuccess(user) {
+  currentUser = user;
+  document.getElementById('login-page').classList.add('hidden');
+  document.querySelector('.user-name').textContent = user.name;
+  document.querySelector('.user-role').textContent = user.role;
+  document.querySelector('.user-avatar').textContent = user.name[0];
+  initCharts();
+  renderTransactions();
+  renderEmployees();
+  renderInventory();
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  // النظام يبدأ بعد تسجيل الدخول
+});
+</script>
+</body>
+</html>
